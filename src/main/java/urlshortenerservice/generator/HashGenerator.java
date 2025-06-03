@@ -1,7 +1,7 @@
-package faang.school.urlshortenerservice.generator;
+package urlshortenerservice.generator;
 
-import faang.school.urlshortenerservice.entity.Hash;
-import faang.school.urlshortenerservice.repository.UniqueIDRepository;
+import urlshortenerservice.entity.Hash;
+import urlshortenerservice.repository.UniqueIDRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package faang.school.urlshortenerservice.config.context;
+package urlshortenerservice.config.context;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +20,7 @@ public class UserHeaderFilter implements Filter {
         String userId = req.getHeader("x-user-id");
         if (userId != null) {
             userContext.setUserId(Long.parseLong(userId));
-        }else {
+        } else {
             throw new IllegalArgumentException("Missing required header 'x-user-id'. Please include 'x-user-id' header with a valid user ID in your request.");
         }
         try {

@@ -1,4 +1,4 @@
-package faang.school.urlshortenerservice.entity;
+package urlshortenerservice.entity;
 
 import jakarta.persistence.*;
 import jdk.jfr.Enabled;
@@ -17,6 +17,7 @@ public class Hash {
 
     @Column(name = "hash", unique = true, nullable = false, length = 7);
     private String hash;
+    private String hashes;
 
     public Hash(String hash) {
         this.hash = hash;

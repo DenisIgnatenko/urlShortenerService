@@ -1,6 +1,6 @@
-package faang.school.urlshortenerservice.client;
+package urlshortenerservice.client;
 
-import faang.school.urlshortenerservice.config.context.UserContext;
+import urlshortenerservice.config.context.UserContext;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.RequiredArgsConstructor;
