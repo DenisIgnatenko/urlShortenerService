@@ -1,177 +1,89 @@
-# 🔗 URL Shortener Microservice
+# URL Shortener Service
 
-A production-ready, high-performance URL Shortening Service built with **Java 17**, **Spring Boot**, **PostgreSQL**, **Redis**, and **Docker**.  
-Designed using **Clean Architecture**, **SOLID principles**, and **scalable practices** to handle real-world workloads.
+This service provides functionality to shorten long URLs into compact, unique hashes for easier sharing and tracking. It supports fast redirection, caching, resilience mechanisms, and is designed with scalability and performance in mind.
 
----
+## Core Features
 
-## 🧠 Overview
+- Shorten long URLs and return unique shortened hashes.
+- Redirect to the original URL when shortened link is accessed.
+- Deduplication: prevents duplicate entries.
+- In-memory caching for fast lookups.
+- Retry logic for transient failures.
+- Thread pool for async task handling.
+- Logging and error tracking.
 
-This service allows users to generate short, unique URLs from long links and redirect users back to the original destination. It ensures:
+## Technology Stack
 
-- Fast access through in-memory caching
-- Persistent storage and recovery via PostgreSQL
-- High availability and resilience using retry policies and fault-tolerant design
-- Asynchronous processing using thread pools
-- Clean, modular code following DDD and SRP
+- Java 17+
+- Spring Boot
+- PostgreSQL
+- Local in-memory cache (optional Redis)
+- Gradle
+- OpenAPI (Swagger)
+- JUnit 5 + Mockito
 
----
+## Architecture
 
-## 🧱 Architecture
+- `URLShortenerController`: REST API handler.
+- `URLShortenerService`: Business logic.
+- `HashGenerator`: Base62 hash generation.
+- `LocalCache`: TTL-enabled cache.
+- `RetryableServiceWrapper`: Retry logic wrapper.
+- `ThreadPoolConfig`: Thread pool executor config.
+- `ShortenedUrl`: JPA Entity.
+- `URLRepository`: URL database access.
+- `UniqueIDRepository`: Unique ID generator.
 
+## API Overview
+
+### POST /api/shorten
+
+Request:
+```json
+{
+  "url": "https://example.com/very/long/path"
+}
 ```
-                +---------------------+
-                |    REST Controller  |
-                +---------------------+
-                          |
-                          v
-                +---------------------+
-                |     URL Service     |
-                +---------------------+
-                | - Generate Hash     |
-                | - Save to DB/Cache  |
-                | - Redirect Logic    |
-                +---------------------+
-                          |
-         +----------------+------------------+
-         |                                   |
-         v                                   v
-+--------------------+           +----------------------+
-|   Redis Cache      |           |   PostgreSQL DB      |
-|  (LocalCache impl) |           |  (JPA Repositories)  |
-+--------------------+           +----------------------+
+
+Response:
+```json
+{
+  "shortUrl": "http://localhost:8080/a3kD2c"
+}
 ```
 
----
+### GET /{hash}
 
-## ⚙️ Technologies Used
+Redirects to the original long URL.
 
-| Layer            | Stack                                     |
-|------------------|-------------------------------------------|
-| Language         | Java 17                                   |
-| Framework        | Spring Boot 3.x                           |
-| Database         | PostgreSQL (JPA/Hibernate)                |
-| Cache            | Redis (custom LocalCache as fallback)     |
-| API Docs         | OpenAPI (Swagger UI via Springdoc)        |
-| Containerization | Docker + Docker Compose                   |
-| Build Tool       | Gradle                                    |
-| Config Mgmt      | Spring `@ConfigurationProperties`         |
-| Retry Policy     | `@Retryable` + `@Recover` + backoff logic |
-| Logging          | SLF4J + Logback                           |
-| Validation       | Jakarta Bean Validation (JSR-380)         |
-| Testing          | JUnit 5, Mockito, Testcontainers          |
+## Design Notes
 
----
+- Base62 encoding of unique numeric ID ensures URL safety and compactness.
+- Identical long URLs return the same shortened version.
+- Resilient with retry and backoff logic.
+- Thread-safe with concurrent structures and executor bounds.
+- Unit-tested core logic.
 
-## 🚀 Features
+## Future Improvements
 
-- ✅ Shorten URLs with unique 6-character keys
-- ✅ In-memory cache for fast lookups
-- ✅ REST API with Swagger documentation
-- ✅ Retry on DB failures
-- ✅ Idempotency and conflict prevention
-- ✅ URL expiration handling (optional)
-- ✅ Asynchronous key generation
-- ✅ Fully dockerized
-- ✅ CI-ready with test coverage
+- Expiring URLs after TTL.
+- Metadata storage (timestamp, IP, user-agent).
+- Distributed caching (Redis).
+- Rate limiting and API keys.
+- Click analytics.
+- Monitoring (Prometheus, Grafana).
 
----
+## How to Run
 
-## 🧪 API Endpoints
-
-| Method | Endpoint           | Description               |
-|--------|--------------------|---------------------------|
-| POST   | `/api/v1/shorten`  | Generate shortened URL    |
-| GET    | `/r/{shortCode}`   | Redirect to full URL      |
-
-View full API docs at: `http://localhost:8080/swagger-ui.html`
-
----
-
-## 🐳 Run with Docker
-
+1. Clone the repo.
+2. Configure PostgreSQL in `application.yml`.
+3. Run the application:
 ```bash
-docker-compose up --build
+./gradlew bootRun
 ```
+4. Swagger available at: `http://localhost:8080/swagger-ui/index.html`
 
-This spins up:
+## Author
 
-- `url-shortener-app` (Spring Boot)
-- `postgres` (DB)
-- `redis` (cache)
-
----
-
-## 🧪 Running Tests
-
-```bash
-./gradlew test
-```
-
-Includes unit and integration tests for:
-
-- URL shortening flow
-- Cache behavior
-- Hash collision detection
-- Service layer logic
-
----
-
-## 📁 Project Structure
-
-```
-src/
- └── main/
-      ├── controller/
-      ├── service/
-      ├── entity/
-      ├── repository/
-      ├── cache/
-      ├── config/
-      └── exception/
-```
-
----
-
-## 🔐 Environment Configuration
-
-Application properties use `application.yml`. Customize with:
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/url_shortener
-    username: postgres
-    password: postgres
-  redis:
-    host: localhost
-    port: 6379
-
-retry:
-  maxAttempts: 3
-  backoff: 2000
-```
-
----
-
-## 🧰 Roadmap (Optional Extensions)
-
-- 🔒 Authenticated shortening
-- 📈 Analytics per link (clicks, devices, geos)
-- 🗑 Expiring links
-- 📬 Email/SMS notifications
-- 🌐 Custom aliases (`denis.link/awesome`)
-
----
-
-## 🧑‍💻 Author
-
-**Denis Ignatenko**  
-Backend & Fullstack Engineer  
-[LinkedIn](https://www.linkedin.com/in/denis-ignatenko/) • [GitHub](https://github.com/...)
-
----
-
-## 📄 License
-
-MIT License
+Denis Ignatenko  
+Backend Engineer | Java, Spring Boot, System Design
