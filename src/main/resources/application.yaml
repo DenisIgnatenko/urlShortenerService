@@ -8,7 +8,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -16,6 +16,17 @@ spring:
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  retry:
+    initial-delay: 1000
+    max-delay: 10000
+    max-attempts: 3
+    multiplier: 2
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/changelog/init.sql
 
 server:
   port: 8080

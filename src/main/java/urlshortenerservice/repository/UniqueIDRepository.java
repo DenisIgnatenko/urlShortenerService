@@ -1,6 +1,8 @@
 package urlshortenerservice.repository;
 
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import urlshortenerservice.entity.Hash;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface UniqueIDRepository extends CrudRepository<Hash, Long> {
+public interface UniqueIDRepository extends JpaRepository<Hash, Long> {
 
     @Query(nativeQuery = true, value = """
             SELECT nextval('unique_hash_number_seq') FROM generate_series(1, :maxRange)
@@ -20,6 +22,7 @@ public interface UniqueIDRepository extends CrudRepository<Hash, Long> {
     // чтобы они не использовались повторно. Поэтому используем RETURNING, чтобы вернуть удаленные хэши.
     // Ведь запрос могут совершать несколько потоков одновременно, и если мы не удалим хэши,
     // то другой поток может получить те же хэши, что и первый, и это приведет к конфликтам.
+    @Modifying
     @Query(nativeQuery = true, value = """
                     DELETE FROM hash WHERE id IN (
                         SELECT id FROM hash ORDER BY id ASC LIMIT :amount

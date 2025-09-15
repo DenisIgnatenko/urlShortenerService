@@ -16,13 +16,22 @@ public class UserHeaderFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+
         HttpServletRequest req = (HttpServletRequest) request;
+
+        String uri = req.getRequestURI();
+        if (uri.startsWith("/swagger") || uri.startsWith("/v3/api-docs") || uri.equals("/") || uri.contains("favicon")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String userId = req.getHeader("x-user-id");
         if (userId != null) {
             userContext.setUserId(Long.parseLong(userId));
         } else {
             throw new IllegalArgumentException("Missing required header 'x-user-id'. Please include 'x-user-id' header with a valid user ID in your request.");
         }
+
         try {
             chain.doFilter(request, response);
         } finally {
